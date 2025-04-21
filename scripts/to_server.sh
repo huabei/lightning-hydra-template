@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+rsync -av -e 'ssh -p 24' /home/huabei/Projects/VS wanghuabei@lab:/home/wanghuabei/project --exclude=logs  --exclude=log --exclude=.env --exclude=data --exclude=*.png --exclude=*.tar.gz --exclude=*.cif --exclude=*.json --exclude=*.prj --exclude=dock_results
