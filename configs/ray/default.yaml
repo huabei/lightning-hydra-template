@@ -1,0 +1,44 @@
+# allowed_tune_functions = {
+#     "choice": tune.choice,
+#     "randint": tune.randint,
+#     "uniform": tune.uniform,
+#     "quniform": tune.quniform,
+#     "loguniform": tune.loguniform,
+#     "qloguniform": tune.qloguniform,
+# }
+search_space: ~
+  # n_layers: tune.choice([32, 64, 128])
+  # lr: tune.uniform(0.001, 0.1)
+
+# scheduler = ASHAScheduler(max_t=num_epochs, grace_period=1, reduction_factor=2)
+scheduler:
+  _target_: ray.tune.schedulers.ASHAScheduler
+  max_t: ${trainer.max_epochs}
+  grace_period: 10
+  reduction_factor: 2
+
+# scaling_config = ScalingConfig(
+#     num_workers=4, use_gpu=True, resources_per_worker={"CPU": 10, "GPU": 1}
+# )
+scaling_config:
+  _target_: ray.train.ScalingConfig
+  num_workers: 1 # 单个任务的配置
+  use_gpu: True
+  resources_per_worker:
+    CPU: 10
+    GPU: 1
+
+# tune_config=tune.TuneConfig(
+#     metric="ptl/val_accuracy",
+#     mode="max",
+#     num_samples=num_samples,
+#     scheduler=scheduler,
+# ),
+tune_config:
+  _target_: ray.tune.TuneConfig
+  metric: val/edge_loss
+  mode: min
+  num_samples: 20
+  scheduler: ${ray.scheduler}
+  search_alg:
+    _target_: ray.tune.search.optuna.OptunaSearch
